@@ -5,20 +5,18 @@ namespace App\Helpers;
 
 final class StringHelper
 {
-    /**
-     * Конвертация GPT‑Markdown в HTML для Telegram
-     * + экранирование опасных символов
-     * + разбивка на части по лимиту 4096 символов
-     *
-     * @return array<string> массив сообщений (каждый ≤ 4096 символов)
-     */
     public static function gptMarkdownToTgHtml(string $string): array
     {
         // Нормализуем переносы строк
         $string = str_replace(["\r\n", "\r"], "\n", $string);
 
-        // --- Блоки кода (```...```)
-        $string = preg_replace('/```(.*?)```/s', '<pre><code>$1</code></pre>', $string);
+        // --- Вырезаем блоки кода ```...```
+        $codeBlocks = [];
+        $string = preg_replace_callback('/```[a-zA-Z0-9]*\n(.*?)```/s', function ($m) use (&$codeBlocks) {
+            $placeholder = '[[[CODEBLOCK_' . count($codeBlocks) . ']]]';
+            $codeBlocks[$placeholder] = '<pre><code>' . htmlspecialchars($m[1], ENT_NOQUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</code></pre>';
+            return $placeholder;
+        }, $string);
 
         // --- Жирный + код (**`...`**)
         $string = preg_replace('/\*\*`(.*?)`\*\*/s', '<b><code>$1</code></b>', $string);
@@ -29,7 +27,7 @@ final class StringHelper
         // --- Жирный (**...**)
         $string = preg_replace('/\*\*(.*?)\*\*/s', '<b>$1</b>', $string);
 
-        // --- Подчёркивание (__...__) → подчёркивание
+        // --- Подчёркивание (__...__)
         $string = preg_replace('/__(.*?)__/s', '<u>$1</u>', $string);
 
         // --- Курсив (*...*) и _..._ только если не внутри слова
@@ -53,7 +51,7 @@ final class StringHelper
         $string = preg_replace('/^- (.*)$/m', '• $1', $string);
         $string = preg_replace('/^\d+\. (.*)$/m', '◦ $1', $string);
 
-        // --- Экранируем всё, кроме разрешённых тегов
+        // --- Экранируем всё остальное
         $string = htmlspecialchars($string, ENT_NOQUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
         // --- Возвращаем разрешённые теги
@@ -64,6 +62,11 @@ final class StringHelper
                 ["<{$tag}>", "</{$tag}>"],
                 $string
             );
+        }
+
+        // --- Вставляем кодовые блоки обратно
+        foreach ($codeBlocks as $ph => $block) {
+            $string = str_replace($ph, $block, $string);
         }
 
         // --- Разбивка на куски ≤ 4096 символов
