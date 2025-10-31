@@ -14,6 +14,8 @@ class ChatGptService
 {
     public function ask(string $prompt, int $chatId): string
     {
+        Log::info(__LINE__ . " promt: \n");
+        Log::info($prompt);
         try {
             $response = Http::withToken(config('openai.api_key'))
                 ->timeout(60)              // общий таймаут
@@ -29,7 +31,7 @@ class ChatGptService
                 ]);
 
             $messages = StringHelper::gptMarkdownToTgHtml($response->json('choices.0.message.content') ?? ['Ошибка при получении ответа']);
-
+            Log::info($messages[0]);
             foreach ($messages as $msg) {
                 Telegram::sendMessage([
                     'chat_id' => $chatId, // 506097513
@@ -37,8 +39,7 @@ class ChatGptService
                     'parse_mode' => 'HTML',
                 ]);
             }
-
-            Log::info($response->json('choices.0.message.content'));
+            Log::info('Sended');
 
             return $response->json('choices.0.message.content') ?? 'Ошибка при получении ответа: '.$response->getBody()->getContents();
         } catch (RequestException $e) {

@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Services\ChatGptService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Telegram\Bot\Laravel\Facades\Telegram;
 
 class TelegramWebhookController extends Controller
@@ -23,6 +24,7 @@ class TelegramWebhookController extends Controller
             return response()->json(['ok' => true]); // ничего не делаем
         }
 
+        Log::info(__LINE__ . ' its ok');
         // Отправляем текст в ChatGPT
         $reply = $chatGpt->ask($text, $chatId);
 
