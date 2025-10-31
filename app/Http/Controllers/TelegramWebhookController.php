@@ -21,15 +21,9 @@ class TelegramWebhookController extends Controller
         }
 
         // Сразу отвечаем Telegram, чтобы он не ретраил
-        dispatch(static function () use ($chatId, $text, $chatGpt) {
-            $reply = $chatGpt->ask($text);
-
-            Telegram::sendMessage([
-                'chat_id' => $chatId,
-                'text'    => $reply,
-                'parse_mode' => 'HTML',
-            ]);
-        });
+//        dispatch(static function () use ($chatId, $text, $chatGpt) {
+            $reply = $chatGpt->ask($text, $chatId);
+//        });
 
         return response('ok', 200);
     }
