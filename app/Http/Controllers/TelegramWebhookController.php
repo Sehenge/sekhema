@@ -33,6 +33,7 @@ class TelegramWebhookController extends Controller
             'parse_mode' => 'HTML', // можно MarkdownV2, если нужно форматирование
         ]);
 
-        return response()->json(['ok' => true]);
+        // Важно: вернуть 200, чтобы Telegram не ретраил
+        return response('ok', 200);
     }
 }
