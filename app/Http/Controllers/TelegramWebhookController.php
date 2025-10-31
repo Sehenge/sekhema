@@ -12,19 +12,20 @@ class TelegramWebhookController extends Controller
 {
     public function handle(Request $request, ChatGptService $chatGpt)
     {
+        // Получаем апдейт от Telegram
         $update = $request->all();
+
+        // Достаём chat_id и текст сообщения
         $chatId = $update['message']['chat']['id'] ?? null;
-        $text   = $update['message']['text'] ?? null;
+        $text = $update['message']['text'] ?? null;
 
         if (! $chatId || ! $text) {
-            return response('ok', 200);
+            return response()->json(['ok' => true]); // ничего не делаем
         }
 
-        // Сразу отвечаем Telegram, чтобы он не ретраил
-//        dispatch(static function () use ($chatId, $text, $chatGpt) {
-            $reply = $chatGpt->ask($text, $chatId);
-//        });
+        // Отправляем текст в ChatGPT
+        $reply = $chatGpt->ask($text);
 
-        return response('ok', 200);
+        return response()->json(['ok' => true]);
     }
 }
