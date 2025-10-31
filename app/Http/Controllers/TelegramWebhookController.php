@@ -7,7 +7,6 @@ namespace App\Http\Controllers;
 use App\Services\ChatGptService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Telegram\Bot\Laravel\Facades\Telegram;
 
 class TelegramWebhookController extends Controller
 {

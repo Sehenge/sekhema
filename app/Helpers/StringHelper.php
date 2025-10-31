@@ -18,7 +18,7 @@ final class StringHelper
         $string = str_replace(["\r\n", "\r"], "\n", $string);
 
         // --- Блоки кода (```...```)
-        $string = preg_replace('/```(.*?)```/s', '<pre>$1</pre>', $string);
+        $string = preg_replace('/```(.*?)```/s', '<pre><code>$1</code></pre>', $string);
 
         // --- Жирный + код (**`...`**)
         $string = preg_replace('/\*\*`(.*?)`\*\*/s', '<b><code>$1</code></b>', $string);
@@ -29,36 +29,31 @@ final class StringHelper
         // --- Жирный (**...**)
         $string = preg_replace('/\*\*(.*?)\*\*/s', '<b>$1</b>', $string);
 
+        // --- Подчёркивание (__...__)
+        $string = preg_replace('/__(.*?)__/s', '<u>$1</u>', $string);
+
         // --- Курсив (*...* или _..._)
         $string = preg_replace('/\*(.*?)\*/s', '<i>$1</i>', $string);
         $string = preg_replace('/_(.*?)_/s', '<i>$1</i>', $string);
 
-        // --- Подчёркивание (__...__)
-        $string = preg_replace('/__(.*?)__/s', '<u>$1</u>', $string);
-
-        // --- Зачёркивание (~~...~~ или ~...~)
+        // --- Зачёркивание (~~...~~)
         $string = preg_replace('/~~(.*?)~~/s', '<s>$1</s>', $string);
-        $string = preg_replace('/~(.*?)~/s', '<s>$1</s>', $string);
 
         // --- Ссылки [text](url)
-        $string = preg_replace('/
-
-\[(.*?)\]
-
-\((.*?)\)/s', '<a href="$2">$1</a>', $string);
+        $string = preg_replace('/\[(.*?)\]\((.*?)\)/s', '<a href="$2">$1</a>', $string);
 
         // --- Цитаты (> ...)
-        $string = preg_replace('/^>\s?(.*)$/m', '<blockquote>$1</blockquote>', $string);
+        $string = preg_replace('/^>\s?(.*)$/m', '— $1', $string);
 
         // --- Списки
         $string = preg_replace('/^- (.*)$/m', '• $1', $string);
         $string = preg_replace('/^\d+\. (.*)$/m', '◦ $1', $string);
 
-        // --- Экранируем угловые скобки
-        $string = str_replace(['<', '>'], ['&lt;', '&gt;'], $string);
+        // --- Экранируем угловые скобки, кроме разрешённых тегов
+        $string = htmlspecialchars($string, ENT_NOQUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
         // --- Возвращаем разрешённые теги
-        $allowed = ['b', 'i', 'u', 's', 'code', 'pre', 'a', 'blockquote'];
+        $allowed = ['b', 'i', 'u', 's', 'code', 'pre', 'a'];
         foreach ($allowed as $tag) {
             $string = str_replace(
                 ["&lt;{$tag}&gt;", "&lt;/{$tag}&gt;"],
@@ -69,7 +64,7 @@ final class StringHelper
 
         // --- Разбивка на куски ≤ 4096 символов
         $chunks = [];
-        $paragraphs = preg_split("/\n{2,}/", $string); // режем по абзацам
+        $paragraphs = preg_split("/\n{2,}/", $string);
         $current = '';
 
         foreach ($paragraphs as $p) {
@@ -77,10 +72,9 @@ final class StringHelper
             if (mb_strlen($try) <= 4096) {
                 $current = $try;
             } else {
-                if ($current !== '') {
+                if ('' !== $current) {
                     $chunks[] = $current;
                 }
-                // если абзац сам > 4096, режем по кускам
                 while (mb_strlen($p) > 4096) {
                     $chunks[] = mb_substr($p, 0, 4096);
                     $p = mb_substr($p, 4096);
@@ -88,7 +82,7 @@ final class StringHelper
                 $current = $p;
             }
         }
-        if ($current !== '') {
+        if ('' !== $current) {
             $chunks[] = $current;
         }
 

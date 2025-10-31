@@ -14,7 +14,7 @@ class ChatGptService
 {
     public function ask(string $prompt, int $chatId): string
     {
-        Log::info(__LINE__ . " promt: \n");
+        Log::info(__LINE__ . ' promt:');
         Log::info($prompt);
         try {
             $response = Http::withToken(config('openai.api_key'))
