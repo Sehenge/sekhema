@@ -24,7 +24,7 @@ class TelegramWebhookController extends Controller
         }
 
         // Отправляем текст в ChatGPT
-        $reply = $chatGpt->ask($text);
+        $reply = $chatGpt->ask($text, $chatId);
 
         return response()->json(['ok' => true]);
     }
