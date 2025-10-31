@@ -29,18 +29,22 @@ final class StringHelper
         // --- Жирный (**...**)
         $string = preg_replace('/\*\*(.*?)\*\*/s', '<b>$1</b>', $string);
 
-        // --- Подчёркивание (__...__)
+        // --- Подчёркивание (__...__) → подчёркивание
         $string = preg_replace('/__(.*?)__/s', '<u>$1</u>', $string);
 
-        // --- Курсив (*...* или _..._)
-        $string = preg_replace('/\*(.*?)\*/s', '<i>$1</i>', $string);
-        $string = preg_replace('/_(.*?)_/s', '<i>$1</i>', $string);
+        // --- Курсив (*...*) и _..._ только если не внутри слова
+        $string = preg_replace('/(?<=\s|\A)\*(.+?)\*(?=\s|\z)/s', '<i>$1</i>', $string);
+        $string = preg_replace('/(?<=\s|\A)_(.+?)_(?=\s|\z)/s', '<i>$1</i>', $string);
 
         // --- Зачёркивание (~~...~~)
         $string = preg_replace('/~~(.*?)~~/s', '<s>$1</s>', $string);
 
         // --- Ссылки [text](url)
-        $string = preg_replace('/\[(.*?)\]\((.*?)\)/s', '<a href="$2">$1</a>', $string);
+        $string = preg_replace('/
+
+\[(.*?)\]
+
+\((.*?)\)/s', '<a href="$2">$1</a>', $string);
 
         // --- Цитаты (> ...)
         $string = preg_replace('/^>\s?(.*)$/m', '— $1', $string);
@@ -49,7 +53,7 @@ final class StringHelper
         $string = preg_replace('/^- (.*)$/m', '• $1', $string);
         $string = preg_replace('/^\d+\. (.*)$/m', '◦ $1', $string);
 
-        // --- Экранируем угловые скобки, кроме разрешённых тегов
+        // --- Экранируем всё, кроме разрешённых тегов
         $string = htmlspecialchars($string, ENT_NOQUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
         // --- Возвращаем разрешённые теги
