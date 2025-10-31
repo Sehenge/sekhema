@@ -12,7 +12,7 @@ use Telegram\Bot\Laravel\Facades\Telegram;
 
 class ChatGptService
 {
-    public function ask(string $prompt, string $chatId): string
+    public function ask(string $prompt, int $chatId): string
     {
         try {
             $response = Http::withToken(config('openai.api_key'))
