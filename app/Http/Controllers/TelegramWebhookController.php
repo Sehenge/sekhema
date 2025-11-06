@@ -8,16 +8,15 @@ use App\Services\ChatGptService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Telegram\Bot\Laravel\Facades\Telegram;
 
 class TelegramWebhookController extends Controller
 {
     public function handle(Request $request, ChatGptService $chatGpt)
     {
-        Log::info(__LINE__ . 'Handle started');
-        // Получаем апдейт от Telegram
-        $update = $request->all();
+        Log::info(__LINE__.'Handle started');
 
-        // Достаём chat_id и текст сообщения
+        $update = $request->all();
         $chatId = $update['message']['chat']['id'] ?? null;
         $text = $update['message']['text'] ?? null;
 
@@ -25,9 +24,7 @@ class TelegramWebhookController extends Controller
             return response()->json(['ok' => true]); // ничего не делаем
         }
 
-        Log::info(__LINE__ . ' its ok');
-        // Отправляем текст в ChatGPT
-        $reply = $chatGpt->ask($text, $chatId);
+        $chatGpt->ask($text, $chatId);
 
         return response()->json(['ok' => true]);
     }
