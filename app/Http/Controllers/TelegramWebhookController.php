@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Services\ChatGptService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class TelegramWebhookController extends Controller
@@ -29,5 +30,21 @@ class TelegramWebhookController extends Controller
         $reply = $chatGpt->ask($text, $chatId);
 
         return response()->json(['ok' => true]);
+    }
+
+    public function setWebhook(Request $request)
+    {
+        // Твой токен
+        $token = config('services.telegram.token');
+
+        // URL вебхука (тот самый маршрут, который обрабатывает апдейты)
+        $webhookUrl = 'https://sekhema.dev/api/telegram/webhook';
+
+        // Запрос к Telegram API
+        $response = Http::post("https://api.telegram.org/bot{$token}/setWebhook", [
+            'url' => $webhookUrl,
+        ]);
+
+        return $response->json();
     }
 }
