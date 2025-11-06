@@ -37,7 +37,7 @@ class AskChatGptJob implements ShouldQueue
         Redis::set("typing_active:{$this->chatId}", '1');
 
         // запускаем цикл typing
-        TypingLoopJob::dispatch($this->chatId);
+        SendTypingJob::dispatch($this->chatId);
 
         try {
             $response = Http::withToken(config('openai.api_key'))
