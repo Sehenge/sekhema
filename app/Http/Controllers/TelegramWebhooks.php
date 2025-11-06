@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Telegram\Bot\Laravel\Facades\Telegram;
 
-class TelegramWebhookController extends Controller
+class TelegramWebhooks extends Controller
 {
     public function handle(Request $request, ChatGptService $chatGpt)
     {
