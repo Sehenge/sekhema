@@ -25,7 +25,7 @@ class ChatGptService
                     'model' => 'gpt-5-nano',
                     'messages' => [
 //                        ['role' => 'system', 'content' => 'Отвечай кратко, максимум 1–2 предложения.'],
-                        ['role' => 'system', 'content' => 'Подготовь ответ в формате GPT-markdown.'],
+                        ['role' => 'system', 'content' => 'Отвечай в формате GPT-markdown, кратко и по делу, не более 3 предложений.'],
                         ['role' => 'user', 'content' => $prompt],
                     ],
                 ]);
