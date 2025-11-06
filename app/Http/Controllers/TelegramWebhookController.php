@@ -12,6 +12,7 @@ class TelegramWebhookController extends Controller
 {
     public function handle(Request $request, ChatGptService $chatGpt)
     {
+        Log::info(__LINE__ . 'Handle started');
         // Получаем апдейт от Telegram
         $update = $request->all();
 
