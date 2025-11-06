@@ -14,7 +14,7 @@ class ChatGptService
 {
     public function ask(string $prompt, int $chatId): string
     {
-        Log::info(__LINE__ . ' promt:');
+        Log::info(__LINE__.' promt:');
         Log::info($prompt);
         try {
             $response = Http::withToken(config('openai.api_key'))
@@ -24,8 +24,10 @@ class ChatGptService
                 ->post(config('openai.base_url').'/chat/completions', [
                     'model' => 'gpt-5-nano',
                     'messages' => [
-//                        ['role' => 'system', 'content' => 'Отвечай кратко, максимум 1–2 предложения.'],
-                        ['role' => 'system', 'content' => 'Отвечай в формате GPT-markdown, кратко и по делу, не более 3 предложений.'],
+                        //                        ['role' => 'system', 'content' => 'Отвечай кратко, максимум 1–2 предложения.'],
+                        [
+                            'role' => 'system',
+                            'content' => 'Отвечай в формате GPT-markdown, кратко и по делу, не более 3 предложений. Отвечай в стиле Моргенштерна, артиста, грубовато с матом'],
                         ['role' => 'user', 'content' => $prompt],
                     ],
                 ]);
