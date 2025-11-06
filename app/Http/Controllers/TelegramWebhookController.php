@@ -34,8 +34,7 @@ class TelegramWebhookController extends Controller
 
     public function setWebhook(Request $request)
     {
-        // Твой токен
-        $token = config('services.telegram.token');
+        $token = config('telegram.bots.mybot.token');
 
         // URL вебхука (тот самый маршрут, который обрабатывает апдейты)
         $webhookUrl = 'https://sekhema.dev/api/telegram/webhook';
