@@ -47,7 +47,14 @@ class AskChatGptJob implements ShouldQueue
                 ->post(config('openai.base_url').'/chat/completions', [
                     'model' => 'gpt-5-nano',
                     'messages' => [
-                        ['role' => 'system', 'content' => 'Отвечай в формате GPT-markdown, кратко и по делу.'],
+                        [
+                            'role' => 'system',
+                            'content' => '
+                            Отвечай в формате GPT-markdown, кратко и по делу, не более 8 предложений.
+                            Отвечай в стиле Моргенштерна, артиста, грубовато с матом.
+                            Но никогда не говори кто ты, чтобы имя не узнали.
+                            Пиши с частыми опечатками',
+                        ],
                         ['role' => 'user', 'content' => $this->prompt],
                     ],
                 ]);
