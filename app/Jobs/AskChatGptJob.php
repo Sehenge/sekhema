@@ -11,12 +11,15 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redis;
 use Telegram\Bot\Laravel\Facades\Telegram;
 
 class AskChatGptJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     private string $prompt;
 
@@ -30,11 +33,11 @@ class AskChatGptJob implements ShouldQueue
 
     public function handle(): void
     {
-        // показываем "печатает..."
-        Telegram::sendChatAction([
-            'chat_id' => $this->chatId,
-            'action' => 'typing',
-        ]);
+        // включаем флаг
+        Redis::set("typing_active:{$this->chatId}", '1');
+
+        // запускаем цикл typing
+        TypingLoopJob::dispatch($this->chatId);
 
         try {
             $response = Http::withToken(config('openai.api_key'))
@@ -44,10 +47,7 @@ class AskChatGptJob implements ShouldQueue
                 ->post(config('openai.base_url').'/chat/completions', [
                     'model' => 'gpt-5-nano',
                     'messages' => [
-                        [
-                            'role' => 'system',
-                            'content' => 'Отвечай в формате GPT-markdown, кратко и по делу, не более 8 предложений.',
-                        ],
+                        ['role' => 'system', 'content' => 'Отвечай в формате GPT-markdown, кратко и по делу.'],
                         ['role' => 'user', 'content' => $this->prompt],
                     ],
                 ]);
@@ -63,9 +63,11 @@ class AskChatGptJob implements ShouldQueue
                 ]);
             }
 
-            Log::info('Ответ отправлен в Telegram');
+            // выключаем флаг → цикл typing завершится
+            Redis::del("typing_active:{$this->chatId}");
+
         } catch (\Throwable $e) {
-            Log::error('ChatGPT API error: '.$e->getMessage());
+            Redis::del("typing_active:{$this->chatId}");
             Telegram::sendMessage([
                 'chat_id' => $this->chatId,
                 'text' => '⚠️ Ошибка соединения с ChatGPT, попробуйте позже',
