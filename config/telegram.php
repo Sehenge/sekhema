@@ -42,6 +42,7 @@ return [
             'commands' => [
                 // Acme\Project\Commands\MyTelegramBot\BotCommand::class
             ],
+            'subscription' => env('SUBSCRIPTION_COMMAND_TEXT', 'SUBSCRIPTION_COMMAND_TEXT'),
         ],
 
         //        'mySecondBot' => [
