@@ -36,6 +36,7 @@ class PaywallWebhooks extends Controller
     private function updateWebhook(Request $request): false|string
     {
         Log::channel('paywall-webhook')->info('TRY UPDATE/CREATE: '.__LINE__);
+        Log::channel('paywall-webhook')->info($request);
 
 
         return true;
@@ -44,6 +45,7 @@ class PaywallWebhooks extends Controller
     private function cancelWebhook(Request $request): false|string
     {
         Log::channel('paywall-webhook')->info('TRY CANCEL: '.__LINE__);
+        Log::channel('paywall-webhook')->info($request);
 
         return true;
     }
