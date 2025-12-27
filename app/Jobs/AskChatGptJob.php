@@ -46,7 +46,7 @@ class AskChatGptJob implements ShouldQueue
             $response = Http::withToken(config('openai.api_key'))
                 ->timeout(60)
                 ->connectTimeout(10)
-                ->retry(3, 2000)
+                ->retry(3, 100)
                 ->post(config('openai.base_url').'/chat/completions', [
                     'model' => 'gpt-5-nano',
                     'messages' => [
