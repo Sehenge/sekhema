@@ -11,6 +11,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Telegram\Bot\Laravel\Facades\Telegram;
 
@@ -45,7 +46,7 @@ class AskChatGptJob implements ShouldQueue
                 ->connectTimeout(10)
                 ->retry(3, 2000)
                 ->post(config('openai.base_url').'/chat/completions', [
-                    'model' => 'gpt-4o',
+                    'model' => 'gpt-4o-mini',
                     'messages' => [
                         [
                             'role' => 'system',
@@ -74,6 +75,7 @@ class AskChatGptJob implements ShouldQueue
             Redis::del("typing_active:{$this->chatId}");
 
         } catch (\Throwable $e) {
+            Log::error($e->getMessage());
             Redis::del("typing_active:{$this->chatId}");
             Telegram::sendMessage([
                 'chat_id' => $this->chatId,
