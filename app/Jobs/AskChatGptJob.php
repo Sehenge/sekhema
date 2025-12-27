@@ -34,6 +34,8 @@ class AskChatGptJob implements ShouldQueue
 
     public function handle(): void
     {
+        $start = microtime(true); // ⏱ старт таймера
+
         // включаем флаг
         Redis::set("typing_active:{$this->chatId}", '1');
 
@@ -73,7 +75,6 @@ class AskChatGptJob implements ShouldQueue
 
             // выключаем флаг → цикл typing завершится
             Redis::del("typing_active:{$this->chatId}");
-
         } catch (\Throwable $e) {
             Log::error($e->getMessage());
             Redis::del("typing_active:{$this->chatId}");
@@ -82,5 +83,8 @@ class AskChatGptJob implements ShouldQueue
                 'text' => '⚠️ Ошибка соединения с ChatGPT, попробуйте позже',
             ]);
         }
+
+        $duration = round(microtime(true) - $start, 2); // ⏱ итог в секундах
+        Log::info("AskChatGptJob completed in {$duration} seconds");
     }
 }
