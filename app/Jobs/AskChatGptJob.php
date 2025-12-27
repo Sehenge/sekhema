@@ -62,7 +62,7 @@ class AskChatGptJob implements ShouldQueue
                     ],
                 ]);
 
-            Log::info(json_encode($response));
+            Log::info(json_encode($response->json()));
 
             $content = $response->json('choices.0.message.content') ?? 'Ошибка при получении ответа';
             $messages = StringHelper::gptMarkdownToTgHtml($content);
