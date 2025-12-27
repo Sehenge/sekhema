@@ -48,7 +48,7 @@ class AskChatGptJob implements ShouldQueue
                 ->connectTimeout(10)
                 ->retry(1, 2000)
                 ->post(config('openai.base_url').'/chat/completions', [
-                    'model' => 'gpt-4o',
+                    'model' => 'gpt-5-nano',
                     'messages' => [
                         [
                             'role' => 'system',
@@ -62,7 +62,7 @@ class AskChatGptJob implements ShouldQueue
                     ],
                 ]);
 
-            Log::info(json_encode($response->json()));
+            Log::info(json_encode($response->status()));
 
             $content = $response->json('choices.0.message.content') ?? 'Ошибка при получении ответа';
             $messages = StringHelper::gptMarkdownToTgHtml($content);
