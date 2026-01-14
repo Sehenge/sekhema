@@ -44,6 +44,8 @@ class AskChatGptJob implements ShouldQueue
         try {
             $start = microtime(true); // ⏱ старт таймера
 
+            Log::info("AskChatGptJob started: {$this->prompt}");
+
             $response = Http::withToken(config('openai.api_key'))
                 ->timeout(60)
                 ->connectTimeout(10)
