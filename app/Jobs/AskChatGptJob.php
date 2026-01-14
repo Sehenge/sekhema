@@ -51,7 +51,7 @@ class AskChatGptJob implements ShouldQueue
                 ->connectTimeout(10)
                 ->retry(1, 2000)
                 ->post(config('openai.base_url').'/chat/completions', [
-                    'model' => 'gpt-5-nano',
+                    'model' => 'gpt-5-nano-2025-08-07',
                     'messages' => [
                         [
                             'role' => 'system',
