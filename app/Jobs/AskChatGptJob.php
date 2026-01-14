@@ -46,12 +46,13 @@ class AskChatGptJob implements ShouldQueue
 
             Log::info("AskChatGptJob started: {$this->prompt}");
 
-            $response = Http::withToken(config('openai.api_key'))
+            $response = Http::withToken(config('deepseek.api_key'))
                 ->timeout(60)
                 ->connectTimeout(10)
                 ->retry(1, 2000)
-                ->post(config('openai.base_url').'/chat/completions', [
-                    'model' => 'gpt-5-nano',
+                ->post(config('deepseek.base_url') . '/chat/completions', [
+//                ->post(config('openai.base_url').'/chat/completions', [
+                    'model' => 'deepseek-chat',
                     'messages' => [
                         [
                             'role' => 'system',
