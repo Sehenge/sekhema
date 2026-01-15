@@ -16,7 +16,7 @@ readonly class SubscriptionService implements SubscriptionContract
         return $this->subscription->checkActiveOrTrialSubscription($telegramUserId);
     }
 
-    public function getSubscriptionDuration(int $telegramUserId, int $botId): string
+    public function getSubscriptionDuration(int $telegramUserId): string
     {
         // TODO: Implement getSubscriptionDuration() method.
 
