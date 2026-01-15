@@ -28,17 +28,17 @@ class ChatGptTestCommand extends Command
      */
     public function handle(ChatGptService $chatGpt): int
     {
+        $chatId = 208791603;
         // Берём prompt из аргумента или спрашиваем у пользователя
         $prompt = $this->argument('prompt')
             ?? $this->ask('Введите текст запроса для ChatGPT');
 
         $this->info("⏳ Отправляем запрос: {$prompt}");
 
-        $reply = $chatGpt->ask($prompt);
+        $chatGpt->ask($prompt, $chatId);
 
         $this->newLine();
         $this->info('💬 Ответ ChatGPT:');
-        $this->line($reply);
 
         return self::SUCCESS;
     }
