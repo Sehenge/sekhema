@@ -73,8 +73,8 @@ class TelegramService
             'inline_keyboard' => [
                 [
                     [
-                        'text' => 'text',
-                        'url' => 'url',
+                        'text' => config('aiservices.sekhema.buy_button_text'),
+                        'url' => config('aiservices.sekhema.buy_button_link'),
                     ],
                 ],
             ],
