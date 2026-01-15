@@ -40,7 +40,6 @@ class HandlePlainTextJob implements ShouldQueue
     public function __construct(
         private readonly string $text,
         private readonly int $chatId,
-        public string $botId,
         private readonly int $messageId,
     ) {}
 
@@ -76,13 +75,13 @@ class HandlePlainTextJob implements ShouldQueue
      */
     public function handle(ChatGptService $chatGptService, TelegramService $telegramService): void
     {
+        $botId = 'sekhema';
         $this->chatGptService = $chatGptService;
         $this->telegramService = $telegramService;
-        $startTime = microtime(true);
         Log::info('HERE handle');
 
-        if (RateLimiter::tooManyAttempts($this->botId, $this->tries)) {
-            $seconds = RateLimiter::availableIn($this->botId);
+        if (RateLimiter::tooManyAttempts($botId, $this->tries)) {
+            $seconds = RateLimiter::availableIn($botId);
             sleep($seconds);
         }
 
@@ -92,7 +91,7 @@ class HandlePlainTextJob implements ShouldQueue
                 $this->chatId
             );
 
-            RateLimiter::increment($this->botId, $this->backoff, $this->tries);
+            RateLimiter::increment($botId, $this->backoff, $this->tries);
         } catch (Exception $exception) {
             $this->failed($exception);
         }

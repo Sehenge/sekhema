@@ -20,11 +20,10 @@ class Subscription extends Model
     /**
      * Check if a user has an active or trial subscription.
      */
-    public function checkActiveOrTrialSubscription(int $telegramUserId, int $botId): bool
+    public function checkActiveOrTrialSubscription(int $telegramUserId): bool
     {
         return $this
             ->where('telegram_id', $telegramUserId)
-            ->where('bot_id', $botId)
             ->where(function ($query): void {
                 $query
                     ->where($this->activeSubscriptionCondition())
@@ -55,12 +54,11 @@ class Subscription extends Model
         };
     }
 
-    public function getSubscriptionForCancel(string $subscriptionId, string $telegramId, int $botId): ?Subscription
+    public function getSubscriptionForCancel(string $subscriptionId, string $telegramId): ?Subscription
     {
         return $this
             ->where('subscription', $subscriptionId)
             ->where('telegram_id', $telegramId)
-            ->where('bot_id', $botId)
             ->first();
     }
 }

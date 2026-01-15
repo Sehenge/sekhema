@@ -47,14 +47,13 @@ class TelegramWebhooks extends Controller
     private function handlePlainTextMessage(int $userId, Request $request): void
     {
         $chatId = $request['message']['chat']['id'];
-        $botId = $request['bot_id'];
 
-        $this->subscriptionService->activateTrial($userId, $botId);
+        $this->subscriptionService->activateTrial($userId);
 
-        if ($this->subscriptionService->checkSubscription($userId, $botId)) {
+        if ($this->subscriptionService->checkSubscription($userId)) {
             $messageId = $request['message']['message_id'];
             //            dispatch(new TgTypingJob($chatId));
-            dispatch(new HandlePlainTextJob($request['message']['text'], $chatId, $botId, $messageId))->onQueue('coze_request'); // todo: uncomment before git push
+            dispatch(new HandlePlainTextJob($request['message']['text'], $chatId, $messageId))->onQueue('coze_request'); // todo: uncomment before git push
         } else {
             $this->telegramService->sendBuySubscriptionMessage($userId);
         }

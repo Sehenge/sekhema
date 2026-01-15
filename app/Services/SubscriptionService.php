@@ -11,9 +11,9 @@ readonly class SubscriptionService implements SubscriptionContract
 {
     public function __construct(private Subscription $subscription) {}
 
-    public function checkSubscription(int $telegramUserId, int $botId): bool
+    public function checkSubscription(int $telegramUserId): bool
     {
-        return $this->subscription->checkActiveOrTrialSubscription($telegramUserId, $botId);
+        return $this->subscription->checkActiveOrTrialSubscription($telegramUserId);
     }
 
     public function getSubscriptionDuration(int $telegramUserId, int $botId): string
@@ -25,14 +25,14 @@ readonly class SubscriptionService implements SubscriptionContract
             ->pluck('kick_at');
     }
 
-    public function renewSubscription(string $telegramUsername, int $botId, int $days): bool
+    public function renewSubscription(string $telegramUsername, int $days): bool
     {
         // TODO: Implement renewSubscription() method.
 
         return false;
     }
 
-    public function activateTrial(int $telegramUserId, int $botId): void
+    public function activateTrial(int $telegramUserId): void
     {
         $trialDays = 1;
         $newSubscription = Subscription::firstOrCreate(
