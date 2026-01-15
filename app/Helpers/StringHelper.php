@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Helpers;
@@ -15,8 +16,9 @@ final class StringHelper
         // --- Вырезаем блоки кода ```...```
         $codeBlocks = [];
         $string = preg_replace_callback('/```[a-zA-Z0-9]*\n(.*?)```/s', function ($m) use (&$codeBlocks) {
-            $placeholder = '[[[CODEBLOCK_' . count($codeBlocks) . ']]]';
-            $codeBlocks[$placeholder] = '<pre><code>' . htmlspecialchars($m[1], ENT_NOQUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</code></pre>';
+            $placeholder = '[[[CODEBLOCK_'.count($codeBlocks).']]]';
+            $codeBlocks[$placeholder] = '<pre><code>'.htmlspecialchars($m[1], ENT_NOQUOTES | ENT_SUBSTITUTE, 'UTF-8').'</code></pre>';
+
             return $placeholder;
         }, $string);
 
@@ -81,7 +83,7 @@ final class StringHelper
             if (mb_strlen($try) <= 4096) {
                 $current = $try;
             } else {
-                if ('' !== $current) {
+                if ($current !== '') {
                     $chunks[] = $current;
                 }
                 while (mb_strlen($p) > 4096) {
@@ -91,11 +93,61 @@ final class StringHelper
                 $current = $p;
             }
         }
-        if ('' !== $current) {
+        if ($current !== '') {
             $chunks[] = $current;
         }
 
         return $chunks;
+    }
+
+    public static function gptMarkdownToTgMarkdown(string $string): string
+    {
+        //        $string = preg_replace('/(?<!\*)\*(?!\*)/', '\*', $string); @\w+
+        //        $string = preg_replace('/\s+/', ' ', $string);
+        //        if (!$onBoarding) {
+        preg_match_all('/@\w+/', $string, $accounts);
+        foreach ($accounts as $account) {
+            $newAccount = str_replace('_', '\\_', $account); // TODO: TG bots
+            $string = str_replace($account, $newAccount, $string);
+        }
+
+        preg_match_all("/(\b(?:(?:http(s)?|ftp):\/\/|(www\.)))([a-zA-Z0-9+&@#\/\-%?=~_|!:,.;]*[a-zA-Z0-9+&@#\/%=:\-~_|]+)/", $string, $urls);
+        foreach ($urls as $url) {
+            $newUrl = str_replace('_', '\\_', $url); // TODO: urls
+            $string = str_replace($url, $newUrl, $string);
+        }
+        //        }
+        // Placeholders
+        $phStrike = 'PLACEHOLDER-STRIKE-PLACEHOLDER';
+        $phItalic = 'PLACEHOLDER-ITALIC-PLACEHOLDER';
+        $phBold = 'PLACEHOLDER-BOLD-PLACEHOLDER';
+        $phUnder = 'PLACEHOLDER-UNDER-PLACEHOLDER';
+
+        $patterns = [
+            '/~~(.*?)~~/' => "$phStrike\$1$phStrike",
+            //            '/\*\*\*(.*?)\*\*\*/' => "$phBold$phItalic\$1$phItalic$phBold",
+            '/\*\*(.*?)\*\*/' => "$phBold\$1$phBold",
+            '/\*(.*?)\*/' => "$phItalic \$1 $phItalic",
+            '/\_\_(.*?)\_\_/' => "$phUnder\$1$phUnder",
+            '/\<u\>(.*?)\<\/u\>/' => "$phUnder\$1$phUnder",
+        ];
+        foreach ($patterns as $pattern => $replacement) {
+            $string = preg_replace($pattern, $replacement, (string) $string);
+        }
+
+        $replacements = [
+            //            "$phItalic$phUnder" => '__',
+            //            "$phUnder$phItalic" => '__',
+            $phBold => '*',
+            $phItalic => '_',
+            $phUnder => '__',
+            $phStrike => '~',
+        ];
+        foreach ($replacements as $search => $replace) {
+            $string = str_replace($search, $replace, $string);
+        }
+
+        return $string;
     }
 
     public static function gptMarkdownToTgMarkdown2(string $string): string
