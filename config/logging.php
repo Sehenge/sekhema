@@ -65,6 +65,13 @@ return [
             'replace_placeholders' => true,
         ],
 
+        'telegram-webhook' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/telegram-webhook.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+        ],
+
         'paywall-webhook' => [
             'driver' => 'single',
             'path' => storage_path('logs/paywall-webhook.log'),
