@@ -43,9 +43,11 @@ class TelegramService
     public function startBot(array $request): void
     {
         $chatId = $request['message']['chat']['id'];
-        $onboardingText = 'Добро пожаловать в чат!';
+        $onboardingText = 'Привет! Меня зовут Сехема ❤️. Предлагаю познакомиться и начать общаться, о чём ты хочешь поговорить? Или задать мне вопрос? 🔥';
 
         $this->sendMessage($chatId, $onboardingText);
+
+        $this->sendMessage(208791603, '🔥 Новый пользователь!');
     }
 
     public function sendSubscriptionInfo(array $request): void
