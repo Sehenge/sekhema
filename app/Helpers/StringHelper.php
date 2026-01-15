@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Helpers;
 
+use Illuminate\Support\Facades\Log;
+
 final class StringHelper
 {
     public static function gptMarkdownToTgHtml(string $string): array
@@ -94,5 +96,49 @@ final class StringHelper
         }
 
         return $chunks;
+    }
+
+    public static function gptMarkdownToTgMarkdown2(string $string): string
+    {
+        Log::info('Original $string: >> '.$string);
+        $string = str_replace('\\n', "\n", $string);
+        $string = self::gptMarkdownToTgMarkdown($string);
+        //        Log::info('After first markdown $string: >> '.$string);
+        $map = [
+            // Mandatory to escape always by documentation
+            '/',
+            '(',
+            ')',
+            '#',
+            '.',
+            '!',
+            '-',
+            '[',
+            ']',
+            '{',
+            '}',
+            '+',
+            '=',
+            // Do not need to escape because used in formatting
+            // '_', // Italic
+            // '__', // underline
+            // '*', // bold
+            // '~', // strike
+            // '`', // mono
+            // '|', // spoiler
+        ];
+
+        foreach ($map as $char) {
+            $string = str_replace($char, "\\$char", $string);
+        }
+
+        /**
+         * Escape only if not at the start of the line
+         * > – quote
+         */
+        $string = str_replace('\\\\', '\\', $string);
+        //        Log::info("\n\n" . 'Final $string: >> ' . $string . "\n\n");
+
+        return preg_replace('/(?<!^)>/m', '\\>', $string);
     }
 }

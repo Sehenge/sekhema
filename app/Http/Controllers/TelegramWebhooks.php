@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Jobs\HandleCommandJob;
+use App\Jobs\HandlePlainTextJob;
 use App\Services\ChatGptService;
+use App\Services\SubscriptionService;
 use App\Services\TelegramService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,6 +17,11 @@ use Illuminate\Support\Facades\Log;
 class TelegramWebhooks extends Controller
 {
     private ChatGptService $chatGpt;
+
+    public function __construct(
+        private readonly TelegramService $telegramService,
+        private readonly SubscriptionService $subscriptionService,
+    ) {}
 
     public function handle(Request $request, ChatGptService $chatGpt): JsonResponse
     {
@@ -39,17 +46,18 @@ class TelegramWebhooks extends Controller
 
     private function handlePlainTextMessage(int $userId, Request $request): void
     {
-        $update = $request->all();
-        $chatId = $update['message']['chat']['id'] ?? null;
-        $text = $update['message']['text'] ?? null;
+        $chatId = $request['message']['chat']['id'];
+        $botId = $request['bot_id'];
 
-        if (! $chatId || ! $text) {
-            response()->json(['ok' => true]); // ничего не делаем
+        $this->subscriptionService->activateTrial($userId, $botId);
+
+        if ($this->subscriptionService->checkSubscription($userId, $botId)) {
+            $messageId = $request['message']['message_id'];
+            //            dispatch(new TgTypingJob($chatId));
+            dispatch(new HandlePlainTextJob($request['message']['text'], $chatId, $botId, $messageId))->onQueue('coze_request'); // todo: uncomment before git push
+        } else {
+            $this->telegramService->sendBuySubscriptionMessage($userId);
         }
-
-        $this->chatGpt->ask($text, $chatId);
-
-        response()->json(['ok' => true]); // ничего не делаем
     }
 
     private function handleBotCommand(Request $request): void

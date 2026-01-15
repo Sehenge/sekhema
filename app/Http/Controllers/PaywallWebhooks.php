@@ -36,7 +36,7 @@ class PaywallWebhooks extends Controller
         };
     }
 
-    private function updateWebhook(Request $request): false|string
+    private function updateWebhook(Request $request): bool
     {
         Log::channel('paywall-webhook')->info('TRY UPDATE/CREATE: '.__LINE__);
         Log::channel('paywall-webhook')->info($request);
