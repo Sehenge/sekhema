@@ -92,7 +92,7 @@ class TelegramService
         ];
 
         if ($replyMarkup !== []) {
-            $messageData['reply_markup'] = json_encode($replyMarkup, JSON_UNESCAPED_UNICODE);
+            $messageData['reply_markup'] = json_encode($replyMarkup, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
         }
 
         if ($messageId !== 0) {
@@ -102,12 +102,7 @@ class TelegramService
         try {
             Telegram::sendMessage($messageData);
         } catch (Exception $e) {
-            if ($e->getCode() === 403) {
-                Log::channel('api-errors')->error(__METHOD__.':'.__LINE__.'  ->  '.$e->getCode());
-                Log::channel('api-errors')->error(__METHOD__.':'.__LINE__.'  ->  '.$e->getMessage());
-
-                throw new Exception($e->getMessage(), $e->getCode());
-            }
+            Log::error($e->getMessage());
         }
     }
 }
