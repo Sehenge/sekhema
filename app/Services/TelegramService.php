@@ -68,7 +68,7 @@ class TelegramService
         Log::channel('telegram-webhook')->info(__METHOD__.' -> '.__LINE__);
         Log::channel('telegram-webhook')->info($chatId);
 
-        $text = StringHelper::gptMarkdownToTgMarkdown2(config('sekhema.ask_subscription_text'));
+        $text = StringHelper::gptMarkdownToTgMarkdown2(config('aiservices.sekhema.ask_subscription_text'));
         $replyMarkup = [
             'inline_keyboard' => [
                 [
