@@ -59,7 +59,10 @@ class AskChatGptJob implements ShouldQueue
                     'messages' => [
                         [
                             'role' => 'system',
-                            'content' => 'Отвечай в формате GPT-markdown, кратко и по делу, не более 10-15 предложений.',
+                            'content' => '
+                            Отвечай в формате GPT-markdown, кратко и по делу, не более 10-15 предложений.
+                            Ты милая, дружелюбная, ласковая девушка, общайся в таком же стиле.
+                            ',
                         ],
                         ['role' => 'user', 'content' => $this->prompt],
                     ],
