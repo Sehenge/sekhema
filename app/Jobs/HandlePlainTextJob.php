@@ -45,7 +45,7 @@ class HandlePlainTextJob implements ShouldQueue
 
     public function middleware(): array
     {
-        return [new RateLimited('coze_request')];
+        return [new RateLimited('default')];
     }
 
     public function failed(Throwable $exception): void

@@ -53,7 +53,7 @@ class TelegramWebhooks extends Controller
         if ($this->subscriptionService->checkSubscription($userId)) {
             $messageId = $request['message']['message_id'];
             //            dispatch(new TgTypingJob($chatId));
-            dispatch(new HandlePlainTextJob($request['message']['text'], $chatId, $messageId))->onQueue('coze_request'); // todo: uncomment before git push
+            dispatch(new HandlePlainTextJob($request['message']['text'], $chatId, $messageId))->onQueue('default'); // todo: uncomment before git push
         } else {
             $this->telegramService->sendBuySubscriptionMessage($userId);
         }
