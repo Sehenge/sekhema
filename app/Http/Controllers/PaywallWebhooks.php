@@ -17,8 +17,6 @@ class PaywallWebhooks extends Controller
 
     private const CANCEL_TYPE = 'cancel';
 
-    private string $newSubscriptionText;
-
     public function __construct(private readonly Subscription $subscription, private readonly TelegramService $telegramService) {}
 
     public function paywallWebhook(Request $request): void
@@ -26,8 +24,7 @@ class PaywallWebhooks extends Controller
         Log::channel('paywall-webhook')->info(now().': paywall-webhook: '.__LINE__);
         Log::channel('paywall-webhook')->info($request);
 
-        $this->newSubscriptionText = 'Спасибо за подписку!';
-        $this->telegramService->sendMessage(208791603, 'Paywall Webhook');
+        $this->telegramService->sendMessage(208791603, 'Новая подписка оформлена/отменена!');
 
         match ($request->input('type')) {
             self::UPDATE_TYPE => $this->updateWebhook($request),
@@ -43,13 +40,11 @@ class PaywallWebhooks extends Controller
 
         $subscription = $request->subscription;
         $telegramId = $request->consumerTelegramId;
-        $botId = $request->bot_id;
 
         try {
             $subscription = $this->subscription::updateOrCreate(
                 [
                     'telegram_id' => $telegramId,
-                    'bot_id' => $botId,
                 ],
                 [
                     'subscription' => $subscription,
@@ -64,14 +59,13 @@ class PaywallWebhooks extends Controller
                 //                $this->telegramService->sendMessage(208791603, 'Test webhook, not real: ' . $this->newSubscriptionText);
                 Telegram::sendMessage([
                     'chat_id' => 208791603,
-                    'text' => 'Test webhook, not real: '.$this->newSubscriptionText,
+                    'text' => 'Test webhook, not real: '.config('aiservices.sekhema.new_subscription_text'),
                     'parse_mode' => TelegramService::PARSEMODE_MARKDOWN_V2,
                 ]);
             } else {
-                //                $this->telegramService->sendMessage($telegramId, $this->newSubscriptionText);
                 Telegram::sendMessage([
                     'chat_id' => $telegramId,
-                    'text' => $this->newSubscriptionText,
+                    'text' => config('aiservices.sekhema.new_subscription_text'),
                     'parse_mode' => TelegramService::PARSEMODE_MARKDOWN_V2,
                 ]);
             }
@@ -92,11 +86,10 @@ class PaywallWebhooks extends Controller
 
         $subscriptionId = $request->subscription;
         $telegramId = $request->consumerTelegramId;
-        $botId = $request->bot_id;
 
         try {
 
-            $subscription = $this->subscription->getSubscriptionForCancel($subscriptionId, $telegramId, $botId);
+            $subscription = $this->subscription->getSubscriptionForCancel($subscriptionId, $telegramId);
             if ($subscription !== null) {
                 $subscription->kick_at = $request->kickAt;
                 $subscription->save();
