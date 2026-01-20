@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Helpers\StringHelper;
+use App\Models\Subscription;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Telegram\Bot\Actions;
@@ -14,7 +15,12 @@ class TelegramService
 {
     public const PARSEMODE_MARKDOWN_V2 = 'MarkdownV2';
 
-    public function __construct() {}
+    private Subscription $subscription;
+
+    public function __construct(Subscription $subscription)
+    {
+        $this->subscription = $subscription;
+    }
 
     public function sendMessage(int $chatId, string $text): void
     {
@@ -55,6 +61,24 @@ class TelegramService
         $subscriptionText = config('telegram.bots.mybot.subscription');
         $chatId = $request['message']['chat']['id'];
         $this->sendMessage($chatId, $subscriptionText);
+    }
+
+    public function sendBalanceInfo(array $request): void
+    {
+        $chatId = $request['message']['chat']['id'];
+        $balance = $this->subscription->getBalance($chatId);
+
+        if ($balance && $balance->plan_tokens) {
+            $balanceText =
+                'Всего '.$balance->plan_tokens.' токенов.'.
+                'Использовано '.$balance->used_plan_tokens;
+
+        } else {
+            $balanceText =
+                'Пробный период '.$balance->trial_tokens.' токенов.'.
+                'Использовано в пробный период '.$balance->used_trial_tokens.' токенов.';
+        }
+        $this->sendMessage($chatId, $balanceText);
     }
 
     public static function sendChatAction(int $chatId): void

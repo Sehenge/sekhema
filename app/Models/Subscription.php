@@ -87,4 +87,11 @@ class Subscription extends Model
             ]);
         }
     }
+
+    public function getBalance(int $telegramUserId): ?Subscription
+    {
+        return $this::query()
+            ->where('telegram_id', $telegramUserId)
+            ->first();
+    }
 }

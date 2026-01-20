@@ -8,7 +8,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
-use Telegram\Bot\Laravel\Facades\Telegram;
 
 class HandleCommandJob implements ShouldQueue
 {
@@ -23,6 +22,8 @@ class HandleCommandJob implements ShouldQueue
     private const COMMAND_START = '/start';
 
     private const COMMAND_SUBSCRIPTION = '/subscription';
+
+    private const COMMAND_BALANCE = '/balance';
 
     private const COMMAND_PRIVACY = '/privacy';
 
@@ -56,6 +57,7 @@ class HandleCommandJob implements ShouldQueue
                     match ($command[0]) {
                         self::COMMAND_START => $this->telegramService->startBot($this->request),
                         self::COMMAND_SUBSCRIPTION => $this->telegramService->sendSubscriptionInfo($this->request),
+                        self::COMMAND_BALANCE => $this->telegramService->sendBalanceInfo($this->request),
                         default => null,
                     };
                 },
