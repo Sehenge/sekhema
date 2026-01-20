@@ -71,7 +71,7 @@ class TelegramService
         if ($balance && $balance->plan_tokens) {
             $balanceText =
                 'Всего '.$balance->plan_tokens." токенов.\n".
-                'Использовано '.$balance->used_plan_tokens;
+                'Использовано '.$balance->used_plan_tokens.' токенов.';
 
         } else {
             $balanceText =
