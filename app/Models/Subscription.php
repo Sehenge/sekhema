@@ -72,7 +72,8 @@ class Subscription extends Model
     public function chargeTokens(int $telegramUserId, int $totalTokens): void
     {
         $subscription = $this::query()
-            ->where('telegram_id', $telegramUserId);
+            ->where('telegram_id', $telegramUserId)
+            ->first();
 
         if ($subscription->trial_kick_at >= now()->toDateString()) {
             $subscription->update([
