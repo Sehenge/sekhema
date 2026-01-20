@@ -35,6 +35,7 @@ readonly class SubscriptionService implements SubscriptionContract
     public function activateTrial(int $telegramUserId): void
     {
         $trialDays = 1;
+        $trialTokens = 10000;
         $newSubscription = Subscription::firstOrCreate(
             [
                 'telegram_id' => $telegramUserId,
@@ -43,6 +44,7 @@ readonly class SubscriptionService implements SubscriptionContract
         if (! $newSubscription->trial_kick_at) {
             $newSubscription->update([
                 'trial_kick_at' => now()->addDays($trialDays - 1)->toDateString(),
+                'trial_tokens' => $trialTokens,
             ]);
         }
     }

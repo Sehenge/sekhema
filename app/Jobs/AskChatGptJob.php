@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Helpers\StringHelper;
+use App\Models\Subscription;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -32,7 +33,7 @@ class AskChatGptJob implements ShouldQueue
         $this->chatId = $chatId;
     }
 
-    public function handle(): void
+    public function handle(Subscription $subscription): void
     {
         Log::info("Handle started: {$this->prompt}");
         // включаем флаг
@@ -76,6 +77,10 @@ class AskChatGptJob implements ShouldQueue
             Log::info(json_encode($response->body()));
 
             $content = $response->json('choices.0.message.content') ?? 'Ошибка при получении ответа';
+            $completionTokens = $response->json('usage.total_tokens') ?? 'Ошибка при получении ответа';
+
+            $subscription->chargeTokens($this->chatId, $completionTokens);
+
             $messages = StringHelper::gptMarkdownToTgHtml($content);
 
             foreach ($messages as $msg) {

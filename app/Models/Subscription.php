@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Models;
@@ -15,6 +16,10 @@ class Subscription extends Model
         'trial_kick_at',
         'kick_at',
         'subscription',
+        'plan_tokens',
+        'used_plan_tokens',
+        'trial_tokens',
+        'used_trial_tokens',
     ];
 
     /**
@@ -39,7 +44,8 @@ class Subscription extends Model
     {
         return function ($query): void {
             $query
-                ->where('kick_at', '>=', now()->toDateString()); // Fixed the comparison
+                ->where('kick_at', '>=', now()->toDateString())
+                ->whereColumn('plan_tokens', '>', 'used_plan_tokens');
         };
     }
 
@@ -50,15 +56,34 @@ class Subscription extends Model
     {
         return function ($query): void {
             $query
-                ->where('trial_kick_at', '>=', now()->toDateString()); // Fixed the comparison
+                ->where('trial_kick_at', '>=', now()->toDateString())
+                ->whereColumn('trial_tokens', '>', 'used_trial_tokens');
         };
     }
 
     public function getSubscriptionForCancel(string $subscriptionId, string $telegramId): ?Subscription
     {
-        return $this
+        return $this::query()
             ->where('subscription', $subscriptionId)
             ->where('telegram_id', $telegramId)
             ->first();
+    }
+
+    public function chargeTokens(int $telegramUserId, int $totalTokens): void
+    {
+        $subscription = $this::query()
+            ->where('telegram_id', $telegramUserId);
+
+        if ($subscription->trial_kick_at >= now()->toDateString()) {
+            $subscription->update([
+                'used_trial_tokens' => $subscription->used_trial_tokens + $totalTokens,
+            ]);
+        }
+
+        if ($subscription->kick_at >= now()->toDateString()) {
+            $subscription->update([
+                'used_tokens' => $subscription->used_tokens + $totalTokens,
+            ]);
+        }
     }
 }
