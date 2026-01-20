@@ -83,7 +83,7 @@ class Subscription extends Model
 
         if ($subscription->kick_at >= now()->toDateString()) {
             $subscription->update([
-                'used_tokens' => $subscription->used_tokens + $totalTokens,
+                'used_plan_tokens' => $subscription->used_tokens + $totalTokens,
             ]);
         }
     }
