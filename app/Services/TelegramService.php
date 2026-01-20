@@ -70,13 +70,13 @@ class TelegramService
 
         if ($balance && $balance->plan_tokens) {
             $balanceText =
-                'Всего '.$balance->plan_tokens." токенов.\n".
-                'Использовано '.$balance->used_plan_tokens.' токенов.';
+                '💼 Основной баланс: '.$balance->plan_tokens." токенов.\n".
+                'Израсходовано: '.$balance->used_plan_tokens.' токенов.';
 
         } else {
             $balanceText =
-                'Пробный период '.$balance->trial_tokens." токенов. \n".
-                'Использовано в пробный период '.$balance->used_trial_tokens.' токенов.';
+                '🧪 Пробный период: '.$balance->trial_tokens." токенов. \n".
+                'Использовано: '.$balance->used_trial_tokens.' токенов.';
         }
         $this->sendMessage($chatId, $balanceText);
     }
