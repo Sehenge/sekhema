@@ -44,7 +44,7 @@ class AskChatGptJob implements ShouldQueue
 
         try {
             $deepseekModel = 'deepseek-chat';
-            $openaiModel = 'gpt-5-nano';
+            $openaiModel = 'gpt-5-mini';
             $start = microtime(true); // ⏱ старт таймера
 
             Log::info("AskChatGptJob started: {$this->prompt}");

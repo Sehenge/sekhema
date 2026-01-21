@@ -50,7 +50,7 @@ class PaywallWebhooks extends Controller
                     'subscription' => $subscription,
                     'kick_at' => Carbon::createFromFormat('Y-m-d', $request->kickAt)?->addYears(100)->toDateString(),
                     'trial_kick_at' => now()->toDateString(),
-                    'plan_tokens' => 5000000,
+                    'plan_tokens' => 1000000,
                     'updated_at' => now()->toDateTimeString(),
                 ]
             );
