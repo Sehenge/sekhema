@@ -70,6 +70,12 @@ class TelegramWebhooks extends Controller
 
         // URL вебхука (тот самый маршрут, который обрабатывает апдейты)
         $webhookUrl = 'https://sekhema.dev/api/telegram/webhook';
+        $oldToken = '8276303483:AAGC3GPK-kiWDG2DUXxHZySe1OA9SS_f_5c';
+
+        // Remove OLD token
+        Http::post("https://api.telegram.org/bot{$oldToken}/setWebhook?remove", [
+            'url' => $webhookUrl,
+        ]);
 
         // Запрос к Telegram API
         $response = Http::post("https://api.telegram.org/bot{$token}/setWebhook", [
